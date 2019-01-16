@@ -48,11 +48,6 @@
             <version>3.0.2</version>
         </dependency>
         <dependency>
-            <groupId>tw.edu.ntu.csie</groupId>
-            <artifactId>libsvm_java</artifactId>
-            <version>3.17.1</version>
-        </dependency>
-        <dependency>
             <groupId>edu.temple.cla.papolicy.wolfgang.texttools</groupId>
             <artifactId>TextToolsUtil</artifactId>
             <version>1.4.0</version>
