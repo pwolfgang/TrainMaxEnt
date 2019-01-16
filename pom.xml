@@ -73,7 +73,7 @@
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>StanfordClassifier</artifactId>
-            <version>3.9.1</version>
+            <version>3.9.1-COPY</version>
         </dependency>
     </dependencies>
     <build>
