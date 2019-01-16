@@ -42,6 +42,7 @@ import edu.temple.cla.papolicy.wolfgang.texttools.util.WordCounter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
 
@@ -88,20 +89,17 @@ public class Main implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         try {
-            List<String> ids = new ArrayList<>();
-            List<String> ref = new ArrayList<>();
-            List<WordCounter> counts = new ArrayList<>();
-            Vocabulary vocabulary = new Vocabulary();
+            List<Map<String, Object>> cases = new ArrayList<>();
             CommonFrontEnd commonFrontEnd = new CommonFrontEnd();
             CommandLine commandLine = new CommandLine(commonFrontEnd);
             commandLine.setUnmatchedArgumentsAllowed(true);
             commandLine.parse(args);
-            commonFrontEnd.loadData(ids, ref, vocabulary, counts);
+            Vocabulary vocabulary = commonFrontEnd.loadData(cases);
             File modelParent = new File(modelOutput);
             Util.delDir(modelParent);
             modelParent.mkdirs();
             Util.outputFile(modelParent, "vocab.bin", vocabulary);
-            GeneralDataset<String, String> trainingData = createDataset(ref, counts);
+            GeneralDataset<String, String> trainingData = createDataset(cases);
             Classifier<String, String> classifier = makeClassifier(trainingData);
             Util.outputFile(modelParent, "classifier.bin", classifier);
         } catch (Exception ex) {
@@ -112,16 +110,15 @@ public class Main implements Callable<Void> {
        
     /**
      * Method to create the Dataset object to be used by the trainer.
-     * @param ref List of the labels
-     * @param counts List of the features as stored in WordCounter objects.
+     * @param cases The training cases
      * @return A Dataset object containing the labels and features.
      */
-    public Dataset<String, String> createDataset(List<String> ref, List<WordCounter> counts) {
-        Dataset<String, String> dataSet = new Dataset<>(ref.size());
-        for (int i = 0; i < ref.size(); i++) {
-            WordCounter count = counts.get(i);
-            dataSet.add(count.getWords(), ref.get(i));
-        }
+    public Dataset<String, String> createDataset(List<Map<String, Object>> cases) {
+        Dataset<String, String> dataSet = new Dataset<>(cases.size());
+        cases.forEach(trainingCase -> {
+            WordCounter count = (WordCounter)trainingCase.get("counts");
+            dataSet.add(count.getWords(), trainingCase.get("theCode").toString());
+        });
         return dataSet;
     }
     
